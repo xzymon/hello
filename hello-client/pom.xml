@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.xzymon</groupId>
+	<artifactId>hello-client</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>hello-client</name>
+
+	<properties>
+		<version.org.jboss.as>7.1.0.Final</version.org.jboss.as>
+		<version.exec.plugin>1.2.1</version.exec.plugin>
+		<version.jboss.maven.plugin>7.4.Final</version.jboss.maven.plugin>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jboss.as</groupId>
+			<artifactId>jboss-as-ejb-client-bom</artifactId>
+			<type>pom</type>
+			<version>${version.org.jboss.as}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.as</groupId>
+			<artifactId>jboss-as-jms-client-bom</artifactId>
+			<type>pom</type>
+			<version>${version.org.jboss.as}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.xzymon</groupId>
+			<artifactId>hello-ejb</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+
+			<!-- Add the maven exec plugin to allow us to run a java program via maven -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${version.exec.plugin}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>java</executable>
+					<workingDirectory>${project.build.directory}/exec-working-directory</workingDirectory>
+					<arguments>
+						<!-- automatically creates the classpath using all project dependencies, 
+							also adding the project build directory -->
+						<argument>-classpath</argument>
+						<classpath>
+						</classpath>
+						<argument>com.xzymon.client.RemoteEJBClient</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+			<!-- build standalone exe jar -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>com.xzymon.client.RemoteEJBClient</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- The JBoss AS plugin deploys your apps to a local JBoss EAP container -->
+			<!-- Disabling it here means that we don't try to deploy this POM! -->
+			<plugin>
+				<groupId>org.jboss.as.plugins</groupId>
+				<artifactId>jboss-as-maven-plugin</artifactId>
+				<version>${version.jboss.maven.plugin}</version>
+				<inherited>true</inherited>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+</project>
