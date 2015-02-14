@@ -1,1 +1,4 @@
-/hello/target/
+/hello/ear/target/
+/hello/ejb/target/
+/hello/war/target/
+/hello-client/target/
